@@ -1,8 +1,9 @@
 class HashMap {
-    constructor(loadFactor = 0, capacity = 8) {
+    constructor(loadFactor = 0.75, capacity = 16) {
         this.loadFactor = loadFactor;
         this.capacity = capacity;
         this.storage = new Array(this.capacity).fill().map(() => []);
+        this.size = 0;
     }
 
     hash(key) {
@@ -17,12 +18,6 @@ class HashMap {
         return hashCode;
     }
 
-    // bucket(key) {
-    //     let hash = this.hash(key)
-    //
-    //     return this.storage[hash]
-    // }
-
     set(key, value) {
 
         let bucket = this.storage[this.hash(key)]
@@ -33,15 +28,28 @@ class HashMap {
                 return;
             }
         }
-        // console.log('this.hash(key)', this.hash(key))
-        // console.log('value', value)
-        // console.log('storage', this.storage)
-        // let testing = this.bucket(key)
-        //
-        // console.log('testing', testing)
-        // testing.push([key, value]);
 
         bucket.push([key, value])
+        this.size++
+
+        if (this.size / this.capacity > this.loadFactor) {
+            console.log(`size: ${this.size} / ${this.capacity} > ${this.loadFactor}`)
+            this.resize()
+        }
+    }
+
+    resize() {
+        this.capacity *= 2;
+
+        const oldStorage = this.storage;
+        this.storage = new Array(this.capacity).fill().map(() => []);
+        this.size = 0;
+
+        for (const bucket of oldStorage) {
+            for (const entry of bucket) {
+                this.set(entry[0], entry[1]);
+            }
+        }
     }
 
     getBucket(key) {
@@ -75,25 +83,53 @@ class HashMap {
 
         if (index !== -1) {
             bucket.splice(index, 1)
+            this.size--;
             return true;
         }
         return false;
     }
 
-    length() {}
+    length() {
+        return this.size;
+    }
 
     clear() {
         this.storage = new Array(this.capacity).fill().map(() => [])
+        this.size = 0;
     }
 
     keys() {
+        const arrayOfKeys = [];
+        const buckets = this.storage;
+        for (let i = 0; i < buckets.length; i++) {
+            for (let j = 0; j < buckets[i].length; j++) {
+                arrayOfKeys.push(buckets[i][j][0])
+            }
+        }
+
+        return arrayOfKeys;
 
     }
 
-    values() {}
+    values() {
+        const arrayOfValues = [];
+        const buckets = this.storage;
+        for (let i = 0; i < buckets.length; i++) {
+            for (let j = 0; j < buckets[i].length; j++) {
+                arrayOfValues.push(buckets[i][j][1])
+            }
+        }
+
+        return arrayOfValues;
+    }
 
     entries() {
-        console.log(this.storage)
+        const entries = [];
+
+        for (const bucket of this.storage) {
+            entries.push(...bucket);
+        }
+        return entries
     }
 }
 
@@ -120,7 +156,7 @@ test.set('jacket', 'blue')
 test.set('kite', 'pink')
 test.set('lion', 'golden')
 
-test.entries()
+// test.entries()
 
 // console.log(test.has('kite'))
 // console.log(test.has('jacket'))
@@ -133,6 +169,16 @@ test.entries()
 // console.log(test.get('astronauta'))
 // console.log(test.get('hat'))
 
-test.remove('lion')
+// test.remove('lion')
 
-test.entries()
+console.log(test.storage)
+console.log('capacity: ', test.capacity)
+console.log('size: ', test.size)
+
+// console.log(test.entries())
+
+test.set('moon', 'silver')
+
+console.log(test.storage)
+console.log('capacity: ', test.capacity)
+console.log('size: ', test.size)
