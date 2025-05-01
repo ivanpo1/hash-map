@@ -22,9 +22,9 @@ class HashMap {
 
         let bucket = this.storage[this.hash(key)]
 
-        for (let keyOf of bucket) {
-            if (keyOf[0] === key) {
-                keyOf[1] = value;
+        for (let pair of bucket) {
+            if (pair[0] === key) {
+                pair[1] = value;
                 return;
             }
         }
@@ -46,8 +46,8 @@ class HashMap {
         this.size = 0;
 
         for (const bucket of oldStorage) {
-            for (const entry of bucket) {
-                this.set(entry[0], entry[1]);
+            for (const pair of bucket) {
+                this.set(pair[0], pair[1]);
             }
         }
     }
@@ -58,9 +58,9 @@ class HashMap {
 
     get(key) {
         const bucket = this.getBucket(key)
-        for (let keyOf of bucket) {
-            if (keyOf[0] === key) {
-                return keyOf[1];
+        for (let pair of bucket) {
+            if (pair[0] === key) {
+                return pair[1];
             }
         }
         return null;
@@ -69,8 +69,8 @@ class HashMap {
     has(key) {
         let bucket = this.getBucket(key)
 
-        for (let keyOf of bucket) {
-            if (keyOf[0] === key) {
+        for (let pair of bucket) {
+            if (pair[0] === key) {
                 return true;
             }
         }
